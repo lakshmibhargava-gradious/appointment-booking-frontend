@@ -23,22 +23,33 @@ if "messages" not in st.session_state:
 # --- Display Chat History (left = assistant, right = user) ---
 # Simple bubble styles for user and assistant
 bubble_style_user = (
-    "background-color:#DCF8C6;padding:10px;border-radius:10px;max-width:70%;margin:5px;"
+    "background-color:#DCF8C6;padding:10px;border-radius:12px;max-width:70%;margin:5px;"
 )
 bubble_style_agent = (
-    "background-color:#F1F0F0;padding:10px;border-radius:10px;max-width:70%;margin:5px;"
+    "background-color:#F1F0F0;padding:10px;border-radius:12px;max-width:70%;margin:5px;"
 )
+
+# Simple emoji avatars (left = assistant avatar, right = user avatar)
+user_avatar = "👤"
+agent_avatar = "🤖"
+avatar_style = "font-size:22px;padding:6px;text-align:center;"
 
 for message in st.session_state.messages:
     role = message.get("role", "assistant")
     content = message.get("content", "")
     if role == "user":
-        _, right_col = st.columns([1, 3])
-        with right_col:
+        # Right-aligned: spacer | bubble | avatar
+        _, bubble_col, avatar_col = st.columns([1, 3, 0.5])
+        with bubble_col:
             st.markdown(f'<div style="{bubble_style_user}">{content}</div>', unsafe_allow_html=True)
+        with avatar_col:
+            st.markdown(f'<div style="{avatar_style}">{user_avatar}</div>', unsafe_allow_html=True)
     else:
-        left_col, _ = st.columns([3, 1])
-        with left_col:
+        # Left-aligned: avatar | bubble | spacer
+        avatar_col, bubble_col, _ = st.columns([0.5, 3, 1])
+        with avatar_col:
+            st.markdown(f'<div style="{avatar_style}">{agent_avatar}</div>', unsafe_allow_html=True)
+        with bubble_col:
             st.markdown(f'<div style="{bubble_style_agent}">{content}</div>', unsafe_allow_html=True)
 
 # --- Handle User Input ---
@@ -46,14 +57,18 @@ if prompt := st.chat_input("How can I help you today?"):
     # 1. Save user message to session state
     st.session_state.messages.append({"role": "user", "content": prompt})
 
-    # Immediately render the user's message on the right
-    _, right_col = st.columns([1, 3])
-    with right_col:
+    # Immediately render the user's message on the right (bubble + avatar)
+    _, bubble_col, avatar_col = st.columns([1, 3, 0.5])
+    with bubble_col:
         st.markdown(f'<div style="{bubble_style_user}">{prompt}</div>', unsafe_allow_html=True)
+    with avatar_col:
+        st.markdown(f'<div style="{avatar_style}">{user_avatar}</div>', unsafe_allow_html=True)
 
-    # 2. Show assistant placeholder on the left while calling API
-    left_col, _ = st.columns([3, 1])
-    with left_col:
+    # 2. Show assistant placeholder on the left while calling API (avatar + bubble)
+    avatar_col, bubble_col, _ = st.columns([0.5, 3, 1])
+    with avatar_col:
+        st.markdown(f'<div style="{avatar_style}">{agent_avatar}</div>', unsafe_allow_html=True)
+    with bubble_col:
         message_placeholder = st.empty()
         message_placeholder.markdown(f'<div style="{bubble_style_agent}">Thinking...</div>', unsafe_allow_html=True)
 
@@ -70,14 +85,14 @@ if prompt := st.chat_input("How can I help you today?"):
         if response.status_code == 200:
             agent_reply = response.text
             # Update placeholder with assistant bubble
-            with left_col:
+            with bubble_col:
                 message_placeholder.markdown(f'<div style="{bubble_style_agent}">{agent_reply}</div>', unsafe_allow_html=True)
             st.session_state.messages.append({"role": "assistant", "content": agent_reply})
         else:
             error_msg = f"Error {response.status_code}: {response.text}"
-            with left_col:
+            with bubble_col:
                 message_placeholder.error(error_msg)
 
     except Exception as e:
-        with left_col:
+        with bubble_col:
             message_placeholder.error(f"Connection Failed: {str(e)}")
