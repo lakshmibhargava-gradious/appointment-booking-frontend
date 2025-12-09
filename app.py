@@ -8,7 +8,7 @@ API_URL = st.secrets["API_URL"]
 API_KEY = st.secrets["API_KEY"]
 
 # --- Page Setup ---
-st.set_page_config(page_title="Dr. Smith's Appointment Bot", page_icon="🏥")
+st.set_page_config(page_title="Doctors Appointment Bot", page_icon="🏥")
 st.title("🏥 Appointment Booking Assistant")
 
 # --- Session State (Memory) ---
