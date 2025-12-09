@@ -3,13 +3,6 @@ import requests
 import uuid
 
 # --- Configuration ---
-# Replace this with your DEPLOYED Azure Function URL
-# It should look like: https://your-app.azurewebsites.net/api/agents/receptionist/run
-API_URL = "https://hospital-booking-agent.azurewebsites.net/api/agents/receptionist/run"
-
-# Paste the Host Key you found here
-# (You can also find it in Azure Portal -> App Keys -> 'default' or 'master')
-API_KEY = "ordP4HE5GfgatoHtGGvMB6filCFFjroZUdRmitM0D_PSAzFuxNfRdw=="
 
 API_URL = st.secrets["API_URL"]
 API_KEY = st.secrets["API_KEY"]
